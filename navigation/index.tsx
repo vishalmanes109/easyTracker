@@ -15,7 +15,7 @@ import useColorScheme from '../hooks/useColorScheme';
 import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import Home from '../screens/Home';
-import TabTwoScreen from '../screens/TabTwoScreen';
+import Recorder from '../screens/Recorder';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import DashBoard from '../screens/DashBoard';
@@ -87,11 +87,11 @@ function BottomTabNavigator() {
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="Recorder"
+        component={Recorder}
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Recorder',
+          tabBarIcon: ({ color }) => <TabBarIcon name="plus" color={color} />,
         }}
       />
 
@@ -104,7 +104,7 @@ function BottomTabNavigator() {
         }}
       />
       <BottomTab.Screen
-        name="Setting"
+        name="AppSetting"
         component={Setting}
         options={{
           title: 'Setting',

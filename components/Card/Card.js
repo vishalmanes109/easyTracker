@@ -1,7 +1,6 @@
 import React from "react";
 import { Text ,View, StyleSheet, TouchableOpacity } from 'react-native';
 const color = require('../../assets/style.json');
-console.log({color})
 const Card = ({title='title', category, amount='20'}) => {
 	return(
 		<View style={Styles.container}>

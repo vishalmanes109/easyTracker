@@ -1,0 +1,9 @@
+{
+    "transactionType":{
+        "income":"blue",
+        "expense":"orange",
+        "investment":"green",
+        "transfer":"pink",
+        "other":"purple"
+    }
+}

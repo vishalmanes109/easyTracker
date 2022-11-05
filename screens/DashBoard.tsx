@@ -1,15 +1,27 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
+import DatePicker from '../components/DatePicker/DatePicker';
 
 import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View } from '../components/Themed';
+import { Text, View, } from '../components/Themed';
 
 export default function DashBoard() {
   return (
-    <View style={styles.container}>
+    <ScrollView >
       <Text style={styles.title}>Tab Two</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
-    </View>
+
+      <DatePicker></DatePicker>
+      
+      <Text style={styles.title}>Tab Two</Text>
+      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
+      <DatePicker></DatePicker>
+
+      <Text style={styles.title}>Tab Two</Text>
+      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
+    </ScrollView>
   );
 }
 

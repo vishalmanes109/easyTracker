@@ -1,137 +1,210 @@
 import { ScrollView, StyleSheet } from 'react-native';
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback, SetStateAction } from 'react';
 import DropDownPicker from "react-native-dropdown-picker";
-
-import { TextInput } from 'react-native-paper';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Button, TextInput } from 'react-native-paper';
 
 import { Text, View } from '../components/Themed';
 import DatePicker from '../components/DatePicker/DatePicker';
+import {
+  transactionTypeDefaultData,
+  incomeCategoryDefaultData,
+  expenseCategoryDefaultData,
+   investmentCategoryDefaultData,
+    transactionModeDefaultData
+} from './data/transactionsData';
 
 export default function Recorder() {
   const [formData, setFormdata] = useState({});
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [genderOpen, setGenderOpen] = useState(false);
-  const [genderValue, setGenderValue] = useState(null);
-  const [gender, setGender] = useState([
-    { label: "Male", value: "male" },
-    { label: "Female", value: "female" },
-    { label: "Prefer Not to Say", value: "neutral" },
-  ]);
+  const [transactionTypeValue, setTransactionTypeValue] = useState(null);
+  const [transactionTypeOpen, setTransactionTypeOpen] = useState(false);
+  const [transactionCategoryValue, setTransactionCategoryValue] = useState(null);
+  const [transactionCategoryOpen, setTransactionCategoryOpen] = useState(false);
+  const [showTransactioCategory, setShowTransactionCategory] = useState(false);
 
-  const onGenderOpen = useCallback(() => {
-    // setCompanyOpen(false);
+  const [transactionModeValue, setTransactionModeValue] = useState(null);
+  const [transactionModeOpen, setTransactionModeOpen] = useState(false);
+  const [showTransactionMode, setShowTransactionMode] = useState(false);
+  
+  const [date, setDate] = useState(new Date());
+  const [show, setShow] = useState(false);
+  const [isDateSelected, setIsDateSelected] = useState(false);
+  const onChange = (event: any, selectedDate: Date) => {
+    setShow(Platform.OS === 'ios');
+    const currentDate = selectedDate || date;
+    let tempDate = new Date(currentDate);
+    let fDate = tempDate.getDate() + '/' + (tempDate.getMonth() + 1) + '/' + tempDate.getFullYear();
+    setDate(currentDate)
+  }
+  const showMode = (currentMode: SetStateAction<string>) => {
+    setShow(true);
+    setIsDateSelected(true);
+  }
+
+  const [transactionType, setTransactionType] = useState(
+    transactionTypeDefaultData
+  );
+
+  const [transactionMode, setTransactionMode] = useState(
+    transactionModeDefaultData
+  );
+
+  let categoryData = expenseCategoryDefaultData;
+  const [transactionCategory, setTransactionCategory] = useState(categoryData);
+
+  useEffect(() => {
+    switch (transactionTypeValue) {
+      case "Income":
+        setTransactionCategory(incomeCategoryDefaultData);
+        break;
+      case "Expense":
+        setTransactionCategory(expenseCategoryDefaultData);
+        break;
+      case "Investment":
+        setTransactionCategory(investmentCategoryDefaultData);
+        break;
+    }
+  }, [transactionTypeValue])
+
+  const onTransactionTypeOpen = useCallback(() => {
+    setTransactionCategoryOpen(false);
   }, []);
 
+  const onTransactionCategoryOpen = useCallback(() => {
+    setTransactionTypeOpen(false);
+  }, []);
+
+  const _onSubmitHandler = () => {
+    setFormdata({
+      title, description, amount, transactionType: transactionTypeValue, transactionCategory: transactionCategoryValue, date
+    });
+    console.log("lol data", { title, description, amount, transactionType: transactionTypeValue, transactionCategory: transactionCategoryValue, date })
+    setTitle("");
+    setDescription("");
+    setAmount("")
+    setTransactionTypeValue(null);
+    setTransactionCategoryValue(null);
+    setShow(false);
+  }
   const props = {
     mode: 'outlined',
     outlineColor: "#BD85EF"
   }
   return (
-    <View style={{ height: '100%' }}>
+    <ScrollView >
+      <View style={styles.container}>
+        <Text style={styles.title}>Recorder</Text>
+        <TextInput style={styles.fields}
+          label="Entry Title (Dine out, Salary etc..)"
+          value={title}
+          onChangeText={text => setTitle(text)}
+          {...props}
+        />
+        <TextInput style={styles.fields}
+          label="Entry Discription"
+          value={description}
+          onChangeText={text => setDescription(text)}
+          {...props}
+          multiline
+        />
+        <TextInput style={styles.fields}
+          label="Amount"
+          value={amount}
+          onChangeText={amount => setAmount(amount)}
+          {...props}
+          multiline
+          keyboardType="numeric"
+        />
+        {/* Transaction Type */}
 
-      <ScrollView >
-        <View style={styles.container}>
-          <Text style={styles.title}>Recorder</Text>
-          <TextInput style={styles.fields}
-            label="Entry Title (Dine out, Salary etc..)"
-            value={title}
-            onChangeText={text => setTitle(text)}
-            {...props}
-          />
-          <TextInput style={styles.fields}
-            label="Entry Discription"
-            value={description}
-            onChangeText={text => setDescription(text)}
-            {...props}
-            multiline
-          />
-          <TextInput style={styles.fields}
-            label="Amount"
-            value={amount}
-            onChangeText={amount => setAmount(amount)}
-            {...props}
-            multiline
-            keyboardType="numeric"
-          />
-          <DropDownPicker style={[styles.fields]}
+        <DropDownPicker style={[styles.fields]}
+          // style={styles.dropdown}
+          open={transactionTypeOpen}
+          value={transactionTypeValue} //genderValue
+          items={transactionType}
+          setOpen={setTransactionTypeOpen}
+          setValue={(transactionTypeValue) => {
+            setTransactionTypeValue(transactionTypeValue),
+              setShowTransactionCategory(true);
+          }}
+          setItems={setTransactionType}
+          placeholder="Select Transaction Type"
+          placeholderStyle={styles.placeholderStyles}
+          onOpen={onTransactionTypeOpen}
+          zIndex={3000}
+          onPress={() => {
+            setShowTransactionCategory(false);
+            setTransactionCategoryValue(null);
+            setShowTransactionMode(false);
+            setTransactionModeValue(null);
+            console.log("pressed")
+          }}
+        />
+        {/* Transaction category */}
+        {
+          showTransactioCategory && <DropDownPicker style={[styles.fields]}
             // style={styles.dropdown}
-            open={genderOpen}
-            value={genderValue} //genderValue
-            items={gender}
-            setOpen={setGenderOpen}
-            setValue={setGenderValue}
-            setItems={setGender}
-            placeholder="Select Transaction Type"
-            placeholderStyle={styles.placeholderStyles}
-            onOpen={onGenderOpen}
-            // onChangeValue={onChange}
-            zIndex={3000}
-            zIndexInverse={1000}
-          />
-          <DropDownPicker style={[styles.fields]}
-            // style={styles.dropdown}
-            open={genderOpen}
-            value={genderValue} //genderValue
-            items={gender}
-            setOpen={setGenderOpen}
-            setValue={setGenderValue}
-            setItems={setGender}
+            open={transactionCategoryOpen}
+            value={transactionCategoryValue} //genderValue
+            items={transactionCategory}
+            setOpen={setTransactionCategoryOpen}
+            setValue={(transactionCategoryValue)=>{
+              setTransactionCategoryValue(transactionCategoryValue);
+              setShowTransactionMode(true);
+            }}
+            setItems={setTransactionCategory}
             placeholder="Transaction Category"
             placeholderStyle={styles.placeholderStyles}
-            onOpen={onGenderOpen}
-            // onChangeValue={onChange}
+            onOpen={onTransactionCategoryOpen}
             zIndex={3000}
-            zIndexInverse={1000}
+            onPress={() => {
+              setShowTransactionMode(false);
+              setTransactionModeValue(null);
+              console.log("pressed lol")
+            }}
           />
-          <TextInput style={styles.fields}
-            label="Amount"
-            value={amount}
-            onChangeText={amount => setAmount(amount)}
-            {...props}
-            multiline
-            keyboardType="numeric"
+        }
+{
+          showTransactionMode&& <DropDownPicker style={[styles.fields]}
+            open={transactionModeOpen}
+            value={transactionModeValue}
+            items={transactionMode}
+            setOpen={setTransactionModeOpen}
+            setValue={setTransactionModeValue}
+            setItems={setTransactionMode}
+            placeholder="Transaction Category"
+            placeholderStyle={styles.placeholderStyles}
+            onOpen={onTransactionCategoryOpen}
+            zIndex={3000}
           />
-          <TextInput style={styles.fields}
-            label="Amount"
-            value={amount}
-            onChangeText={amount => setAmount(amount)}
-            {...props}
-            multiline
-            keyboardType="numeric"
-          />
-          <TextInput style={styles.fields}
-            label="Amount"
-            value={amount}
-            onChangeText={amount => setAmount(amount)}
-            {...props}
-            multiline
-            keyboardType="numeric"
-          />
-          <TextInput style={styles.fields}
-            label="Amount"
-            value={amount}
-            onChangeText={amount => setAmount(amount)}
-            {...props}
-            multiline
-            keyboardType="numeric"
-          />
-          
-          <View>
-          <DatePicker></DatePicker>
-          </View>
-          <TextInput style={styles.fields}
-            label="Amount"
-            value={amount}
-            onChangeText={amount => setAmount(amount)}
-            {...props}
-            multiline
-            keyboardType="numeric"
-          />
+        }
+        {/* <DatePicker showDate></DatePicker> */}
+
+        <View style={styles.container}>
+          <Button style={styles.button} icon="pen" mode="contained" onPress={() => showMode('date')}>
+            Select Date of transaction   </Button>
+          {show &&
+            <DateTimePicker
+              value={date}
+              is24Hour
+              display='default'
+              onChange={onChange}
+            >
+            </DateTimePicker>
+          }
+          {isDateSelected && <Text> Transaction Date:- {date.toDateString()}</Text>}
         </View>
-      </ScrollView >
-    </View>
+        <Button icon="plus" mode="contained" onPress={_onSubmitHandler}>
+          Add Transaction
+        </Button>
+        <View
+          style={{ height: 200 }}
+        ></View>
+      </View>
+    </ScrollView >
   );
 }
 
@@ -170,4 +243,19 @@ const styles = StyleSheet.create({
   placeholderStyles: {
     color: "grey",
   },
+  datePicker: {
+    width: "100%",
+    color: "red",
+  },
+  // container: {
+  //   flex: 1,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   width:"100%"
+  // },
+  button: {
+    width: "90%",
+    margin: 10,
+    padding: 5
+  }
 });
